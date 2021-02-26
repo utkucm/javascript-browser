@@ -17,6 +17,7 @@ export const unpkgPathPlugin = () => {
             path: new URL(args.path, 'https://unpkg.com' + args.resolveDir + '/').href,
           };
         }
+
         return {
           namespace: 'a',
           path: `https://unpkg.com/${args.path}`,
@@ -30,8 +31,8 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-              const message = require('nested-test-pkg');
-              console.log(message);
+              import React from 'react';
+              console.log(react, ReactDOM);
             `,
           };
         }
