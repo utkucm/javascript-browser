@@ -1,5 +1,17 @@
 import * as esbuild from 'esbuild-wasm';
 import axios from 'axios';
+import localforage from 'localforage';
+
+const packageCache = localforage.createInstance({
+  name: 'packageCache',
+});
+
+(async () => {
+  await packageCache.setItem('color', 'red');
+
+  const color = await packageCache.getItem('color');
+  console.log(color);
+})();
 
 export const unpkgPathPlugin = () => {
   return {
@@ -31,18 +43,32 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-              import React from 'react';
-              console.log(react, ReactDOM);
+              import React, { useState } from 'react-select';
+              console.log(React, useState);
             `,
           };
         }
 
+        // Check if the package is aldready fetched and if yes, cache it
+        const cachedResult = await packageCache.getItem<esbuild.OnLoadResult>(args.path);
+
+        if (cachedResult) {
+          return cachedResult;
+        }
+
+        // Store the data in cache
         const { data, request } = await axios.get(args.path);
-        return {
+
+        const result: esbuild.OnLoadResult = {
           loader: 'jsx',
           contents: data,
           resolveDir: new URL('./', request.responseURL).pathname,
         };
+
+        // Stored result in cache
+        await packageCache.setItem(args.path, result);
+
+        return result;
       });
     },
   };
