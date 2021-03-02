@@ -11,9 +11,6 @@ export const unpkgPathPlugin = () => {
   return {
     name: 'unpkg-path-plugin',
     setup(build: esbuild.PluginBuild) {
-      /**
-       * @onRESOLVE
-       */
       // Handles root entry file of package
       build.onResolve({ filter: /(^index\.js$)/ }, () => {
         return { namespace: 'a', path: 'index.js' };

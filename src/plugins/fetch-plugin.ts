@@ -10,6 +10,7 @@ export const fetchPlugin = (inputCode: string) => {
   return {
     name: 'fetch-plugin',
     setup(build: esbuild.PluginBuild) {
+      // Handles root entry file of package
       build.onLoad({ filter: /(^index\.js$)/ }, () => {
         return {
           loader: 'jsx',
@@ -17,14 +18,17 @@ export const fetchPlugin = (inputCode: string) => {
         };
       });
 
-      build.onLoad({ filter: /.css$/ }, async (args: any) => {
+      build.onLoad({ filter: /.*/ }, async (args: any) => {
         // Check if the package is aldready fetched and if yes, cache it
         const cachedResult = await packageCache.getItem<esbuild.OnLoadResult>(args.path);
 
         if (cachedResult) {
           return cachedResult;
         }
+      });
 
+      // Handles css files
+      build.onLoad({ filter: /.css$/ }, async (args: any) => {
         // Store the data in cache
         const { data, request } = await axios.get(args.path);
 
@@ -48,13 +52,6 @@ export const fetchPlugin = (inputCode: string) => {
       });
 
       build.onLoad({ filter: /.*/ }, async (args: any) => {
-        // Check if the package is aldready fetched and if yes, cache it
-        const cachedResult = await packageCache.getItem<esbuild.OnLoadResult>(args.path);
-
-        if (cachedResult) {
-          return cachedResult;
-        }
-
         // Store the data in cache
         const { data, request } = await axios.get(args.path);
 
