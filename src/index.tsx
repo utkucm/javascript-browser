@@ -17,7 +17,7 @@ const App: React.FC = () => {
   const startService = async () => {
     ref.current = await esbuild.startService({
       worker: true,
-      wasmURL: 'https//unpkg.com/esbuild-wasm@0.8.27/esbuild.wasm',
+      wasmURL: 'https://unpkg.com/esbuild-wasm@0.8.27/esbuild.wasm',
     });
   };
 
@@ -37,10 +37,14 @@ const App: React.FC = () => {
       },
     });
 
-    // console.log(result);
-
     setCode(result.outputFiles[0].text);
   };
+
+  const html = `
+      <script>
+        ${code}
+      </script>
+    `;
 
   return (
     <div>
@@ -49,6 +53,7 @@ const App: React.FC = () => {
         <button onClick={onClick}>Submit</button>
       </div>
       <pre>{code}</pre>
+      <iframe sandbox='allow-scripts' title='doc' srcDoc={html} />
     </div>
   );
 };
